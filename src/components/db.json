@@ -1,0 +1,27 @@
+{"emoList": [
+  {
+    "cat": "coffee",
+    "catEmo": "☕️",
+    "id": "1"
+  },
+  {
+    "cat": "cake",
+    "catEmo": "🥐",
+    "id": "2"
+  },
+  {
+    "cat": "books, magazines",
+    "catEmo": "📚",
+    "id": "3"
+  },
+  {
+    "cat": "miscellaneous cheap",
+    "catEmo": "🍺🎬🍣",
+    "id": "4"
+  },
+  {
+    "cat": "miscellaneous expensive",
+    "catEmo": "🎻👗💄",
+    "id": "5"
+  }
+]}
