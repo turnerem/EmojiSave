@@ -2,12 +2,19 @@ import React, { Component } from 'react'
 import { Text, StyleSheet, View, TextInput } from 'react-native'
 // import ActionButton from 'react-native-action-button';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import Database from '../../Database';
 
+const db = new Database();
 
 export default class SignUpForm extends Component {
   state = {
     username: ''
   }
+
+  componentDidMount() {
+    this.tmpGetCats();
+  }
+
   render() {
     return (
       [
@@ -75,6 +82,14 @@ export default class SignUpForm extends Component {
 
   handleChangeUsername = (value) => {
     this.setState({ username: value });
+  }
+
+  tmpGetCats = () => {
+    db.getAllTab('Categories').then((res) => {
+      console.log('back in tmpGetCats')
+    }).catch((err) => {
+      console.log('an error in tmpGetCats!', err)
+    })
   }
 }
 

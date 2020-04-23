@@ -8,11 +8,31 @@ executeSql:
 SQLitePlugin.prototype.executeSql = function(sstatement, params, success, error) (in sqlite.core.js)
 */
 
-const db_name = "Categories.db";
+const db_name = "VBank.db";
 const db_loc = "Library";
 
 export default class Database {
-  initDB() {
+  createTableFor = {
+    Categories: 
+      `CREATE TABLE IF NOT EXISTS Categories (
+        cat_id INTEGER NOT NULL PRIMARY KEY, 
+        cat varchar(64), 
+        cat_emoji varchar(64))`,
+    SpendEvents:
+      `CREATE TABLE IF NOT EXISTS SpendEvents (
+        event_id INTEGER NOT NULL PRIMARY KEY,
+        cat_id INTEGER NOT NULL FOREIGN KEY REFERENCES Categories(cat_id),
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        amount DOUBLE(10, 2))`,
+    SpendEvents:
+      `CREATE TABLE IF NOT EXISTS SpendEvents (
+        event_id INTEGER NOT NULL PRIMARY KEY,
+        cat_id INTEGER NOT NULL FOREIGN KEY REFERENCES Categories(cat_id),
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        amount DOUBLE(10, 2))`,
+      
+  }
+  initDbFor(tab) {
     let db;
     return new Promise((resolve) => {
       console.log("Plugin integrity check...");
@@ -26,18 +46,18 @@ export default class Database {
           .then(res => {
             db = res;
             console.log("Database OPEN");
-            db.executeSql('SELECT * FROM Categories').then(() => {
+            db.executeSql(`SELECT * FROM ?`, [tab]).then(() => {
               console.log("Database is ready ... executing query ...");
             }).catch((error) =>{
               console.log("Received error: ", error);
               console.log("Database not yet ready ... populating data");
               db.transaction((tx) => {
-                tx.executeSql(
-                  `CREATE TABLE IF NOT EXISTS Categories (
-                    cat_id INTEGER NOT NULL PRIMARY KEY, 
-                    cat varchar(64), 
-                    cat_emoji varchar(64))`
-                  );
+                tx.executeSql(this.createTableFor[tab]);
+                // tx.executeSql(
+                //   `CREATE TABLE IF NOT EXISTS Categories (
+                //     cat_id INTEGER NOT NULL PRIMARY KEY, 
+                //     cat varchar(64), 
+                //     cat_emoji varchar(64))`);
               }).then(() => {
                 console.log("Table created successfully");
                }).catch(error => {
@@ -56,7 +76,7 @@ export default class Database {
     });
   };
 
-  closeDB(db) {
+  closeDb(db) {
     if (db) {
       console.log("Closing DB");
       db.close()
@@ -67,14 +87,33 @@ export default class Database {
           console.log(error);
         });
     } else {
-      console.log("Database was not OPENED");
+      console.log("Database was not OPEN");
     }
   };
 
-  // add one category at a time. How to add several? When to call the several version?
-  addCat(aCat) {
+  getAllTab(tab) {
     return new Promise((resolve) => {
-      this.initDB().then((db) => {
+      // const data = [];
+      this.initDbFor(tab).then((db) => {
+        db.transaction((tx) => {
+          tx.executeSql(`SELECT * FROM ?`, [tab])
+        }).then(([tx, res]) => {
+          console.log(res.rows.length, 'row count in TAB')
+        }).then((res) => {
+          this.closeDb(db);
+        }).catch((err) => {
+          console.log(err)
+        })
+      }).catch((err) => {
+        console.log('the Last Err', err)
+      })
+    })
+  }
+
+  // add one category at a time. How to add several? When to call the several version?
+  addCat(someCats) {
+    return new Promise((resolve) => {
+      this.initDbFor("Categories").then((db) => {
         db.transaction((tx) => {
           tx.executeSql(
             `INSERT INTO Categories (cat, cat_emoji) VALUES (?, ?)`,
@@ -92,7 +131,8 @@ export default class Database {
         })
       })
     }
-  }
+
+  
 
   /*
   syntax for multiple rows: 
@@ -105,4 +145,4 @@ export default class Database {
 
  
 };              
-           
+          
