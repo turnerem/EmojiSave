@@ -12,3 +12,8 @@
 # V similar views
 - spent, saved, and difference: these are very similar, but with different data
 - write DRY code with this in mind
+
+## This evening:
+- list the steps that need to be taken when setting up SQLite schema.
+  - Make them short, sweet, memorable.
+- Understand New PROMISES being made in code

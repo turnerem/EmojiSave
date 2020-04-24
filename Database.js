@@ -12,26 +12,7 @@ const db_name = "VBank.db";
 const db_loc = "Library";
 
 export default class Database {
-  createTableFor = {
-    Categories: 
-      `CREATE TABLE IF NOT EXISTS Categories (
-        cat_id INTEGER NOT NULL PRIMARY KEY, 
-        cat varchar(64), 
-        cat_emoji varchar(64))`,
-    SpendEvents:
-      `CREATE TABLE IF NOT EXISTS SpendEvents (
-        event_id INTEGER NOT NULL PRIMARY KEY,
-        cat_id INTEGER NOT NULL FOREIGN KEY REFERENCES Categories(cat_id),
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        amount DOUBLE(10, 2))`,
-    SpendEvents:
-      `CREATE TABLE IF NOT EXISTS SpendEvents (
-        event_id INTEGER NOT NULL PRIMARY KEY,
-        cat_id INTEGER NOT NULL FOREIGN KEY REFERENCES Categories(cat_id),
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        amount DOUBLE(10, 2))`,
-      
-  }
+
   initDbFor(tab) {
     let db;
     return new Promise((resolve) => {
@@ -96,7 +77,7 @@ export default class Database {
       // const data = [];
       this.initDbFor(tab).then((db) => {
         db.transaction((tx) => {
-          tx.executeSql(`SELECT * FROM ?`, [tab])
+          tx.executeSql(`SELECT * FROM ?`, [tab]);
         }).then(([tx, res]) => {
           console.log(res.rows.length, 'row count in TAB')
         }).then((res) => {
@@ -111,18 +92,17 @@ export default class Database {
   }
 
   // add one category at a time. How to add several? When to call the several version?
-  addCat(someCats) {
+  addCat(cat, catEmoji) {
     return new Promise((resolve) => {
       this.initDbFor("Categories").then((db) => {
         db.transaction((tx) => {
           tx.executeSql(
             `INSERT INTO Categories (cat, cat_emoji) VALUES (?, ?)`,
-            [aCat.cat, aCat.catEmoji])
-            .then(([tx, res]) => {
+            [cat, catEmoji]).then(([tx, res]) => {
               resolve(res);
             })
           }).then((res) => {
-            this.closeDB(db);
+            this.closeDb(db);
           }).catch((err) => {
             console.log(err);
           })
